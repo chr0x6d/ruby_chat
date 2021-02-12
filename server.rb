@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 require "socket"
 
 class Server
@@ -9,20 +9,23 @@ class Server
   end
 
   def run
-    loop do
-      Thread.new(@server.accept) do |client|
-        client.puts "Enter your username"
-        nickname = client.gets.chomp
-        @clients.each_key do |other_nick|
-          if nickname == other_nick
-            client.puts "That username is already taken"
-            Thread.kill self
+    begin
+      loop do
+        Thread.new(@server.accept) do |client|
+          nickname = client.gets.chomp
+          @clients.each_key do |other_nick|
+            if nickname == other_nick
+              client.puts "That username is already taken"
+              Thread.kill self
+            end
           end
+          @clients[nickname] = client
+          broadcast("#{nickname} has joined the server!")
+          listener(nickname, client)
         end
-        @clients[nickname] = client
-        broadcast("#{nickname} has joined the server!")
-        listener(nickname, client)
       end
+    rescue Exception => e
+      puts e.message
     end
   end
 
@@ -45,5 +48,6 @@ class Server
     end
   end
 end
-
-Server.new("localhost", 3000)
+PORT = ARGV[0]
+PORT ||= 3000
+Server.new("localhost", PORT)

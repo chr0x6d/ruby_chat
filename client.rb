@@ -1,13 +1,21 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 require "socket"
 
 class Client
+  def get_input(prompt = '> ')
+    print prompt
+    msg = $stdin.gets.chomp
+  end
+
   def initialize(host, port)
     @client = TCPSocket.new(host, port)
+    puts "Enter your username"
+    @nickname = get_input
+    # First communication from client is sending their chosen nickname
+    @client.puts @nickname
     listen
     send
     @listen_thread.join
-    @send_thread.join
   end
 
   def listen
@@ -20,13 +28,14 @@ class Client
   end
 
   def send
-    @send_thread = Thread.new() do
-      loop do
-        msg = $stdin.gets.chomp
-        @client.puts msg
-      end
+    loop do
+      msg = get_input("#{@nickname}> ")
+      @client.puts msg
     end
   end
 end
-
-Client.new("localhost", 3000)
+HOST = ARGV[0]
+PORT = ARGV[1]
+HOST ||= 'localhost'
+PORT ||= 3000
+Client.new(HOST, PORT)

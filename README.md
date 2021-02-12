@@ -1,8 +1,10 @@
 # ruby_chat
-Simple Terminal LAN chat in Ruby
+Simple Terminal LAN chat in Ruby\
+Client text is broken because there is no separation of input/output
 
-By default host is "localhost" and port 3000.
+Defaults to localhost:3000\
+First start server to listen for client connections\
+`./server.rb <PORT>`
 
-Run one server first with `ruby server.rb`
-
-Then as many Clients as you wish can be launched anywhere on your LAN with `ruby client.rb`
+Then multiple clients can be launched\
+`./client.rb <HOST> <PORT>`
